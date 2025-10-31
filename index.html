@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kuin Life — Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-theme="light">
+    <div class="app">
+        <header class="header">
+            <div class="header-left">
+                <div id="clockSmall" class="clock-small">--:--:--</div>
+            </div>
+
+            <div class="header-right">
+                <button id="musicToggle" class="icon-btn" title="Nhạc">🎵</button>
+                <button id="bgToggle" class="icon-btn" title="Đổi nền">🌄</button>
+                <button id="themeToggle" class="icon-btn" title="Sáng/Tối">🌙</button>
+            </div>
+        </header>
+
+        <main class="main">
+            <!-- LEFT: To-do column -->
+            <aside class="col left-col">
+                <div class="panel todo-panel">
+                    <h3>📋 To-do</h3>
+
+                    <div class="todo-inputs">
+                        <input id="todoText" type="text" placeholder="   " />
+                        <input id="todoLink" type="url" placeholder="Link " />
+                        <div style="display:flex; gap:8px;">
+                            <button id="addTodoBtn" class="btn primary">+</button>
+                            <button id="exportTodoBtn" class="btn">Xuất</button>
+                        </div>
+                    </div>
+
+                    <div id="todoList" class="todo-list" aria-live="polite"></div>
+                </div>
+            </aside>
+
+            <!-- CENTER: Idea + Pomodoro -->
+            <section class="col center-col">
+                <div class="pair">
+                    <!-- Idea -->
+                    <div class="square-card idea-card">
+                        <div class="card-head">
+                            <div class="icon">🗒️</div>
+                            <div>
+                                <div class="title">Ideas</div>
+                                <div class="muted">Ghi nhanh — chỉnh sửa & xóa</div>
+                            </div>
+                        </div>
+
+                        <div class="idea-controls">
+                            <input id="ideaInput" placeholder="Nhập ý tưởng..." />
+                            <button id="addIdeaBtn" class="btn primary">＋</button>
+                        </div>
+
+                        <div id="ideaList" class="idea-list"></div>
+                    </div>
+
+                    <!-- Pomodoro -->
+                    <div class="square-card pom-card">
+                        <div class="card-head center">
+                            <div class="icon large">🍏</div>
+                            <div>
+                                <div class="title">Pomodoro</div>
+                                <div id="pomState" class="muted">Mode: Làm việc</div>
+                            </div>
+                        </div>
+
+                        <div class="pom-body">
+                            <div id="pomTimer" class="pom-timer">25:00</div>
+
+                            <div class="inputs-row">
+                                <label>Work
+                                    <input id="workMinutes" type="number" min="1" value="25" />
+                                </label>
+                                <label>Break
+                                    <input id="breakMinutes" type="number" min="1" value="5" />
+                                </label>
+                            </div>
+
+                            <div class="pom-controls">
+                                <button id="startPom" class="btn primary">Start</button>
+                                <button id="pausePom" class="btn">Pause</button>
+                                <button id="resetPom" class="btn">Reset</button>
+                            </div>
+                        </div>
+
+                        <audio id="ding" preload="auto"
+                            src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3"></audio>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Popups (initially hidden) -->
+        <!-- MUSIC POPUP -->
+        <div class="popup" id="musicPopup" aria-hidden="true">
+            <div class="popup-inner">
+                <h4>🎧 Trình phát nhạc</h4>
+                <div class="popup-row">
+                    <label>Upload (mp3)</label>
+                    <input id="musicUpload" type="file" accept="audio/*">
+                </div>
+                <div class="popup-row">
+                    <label>Hoặc dán link YouTube</label>
+                    <input id="musicYouTube" type="text" placeholder="https://www.youtube.com/watch?v=..." />
+                    <button id="loadYT" class="btn">Nhúng</button>
+                </div>
+                <div id="audioContainer" class="audio-container"></div>
+                <div style="text-align:right; margin-top:8px;">
+                    <button id="closeMusic" class="btn">Đóng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BG POPUP -->
+        <div class="popup" id="bgPopup" aria-hidden="true">
+            <div class="popup-inner">
+                <h4>🌄 Chọn nền</h4>
+                <div class="popup-row">
+                    <input id="bgUpload" type="file" accept="image/*" />
+                </div>
+                <div class="popup-row">
+                    <input id="bgUrl" type="text" placeholder="Link ảnh (http...)" />
+                    <button id="applyBgBtn" class="btn">Áp dụng</button>
+                </div>
+                <div style="text-align:right; margin-top:8px;">
+                    <button id="closeBg" class="btn">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
