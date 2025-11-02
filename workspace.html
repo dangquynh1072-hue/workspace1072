@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <a href="index.html" class="btn">Workspace</a>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kuin Smart Space — v3</title>
+    <style>
+        :root {
+            --bg1: #eaf6ff;
+            /* soft blue sky */
+            --bg2: #f6fbff;
+            /* lighter */
+            --glass: rgba(255, 255, 255, 0.65);
+            --card: rgba(255, 255, 255, 0.9);
+            --muted: #566174;
+            --accent-a: #8fc9ff;
+            /* pastel blue */
+            --accent-b: #cfeaff;
+            /* pastel baby blue */
+            --shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+            --radius: 14px;
+            --sidebar-width: 220px;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+
+        [data-theme="dark"] {
+            --bg1: #071022;
+            --bg2: #12061a;
+            --glass: rgba(10, 12, 20, 0.5);
+            --card: rgba(7, 20, 34, 0.7);
+            --muted: #9aa6c0;
+            --shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(120deg, var(--bg1), var(--bg2));
+            overflow: hidden;
+            color: #071022
+        }
+
+        .cloud-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: linear-gradient(120deg, var(--bg1), var(--bg2));
+        }
+
+        .clouds {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.95) 0 8%, transparent 30%), radial-gradient(circle at 80% 80%, rgba(255, 250, 255, 0.9) 0 10%, transparent 34%);
+            opacity: 0.9;
+            filter: blur(40px);
+            animation: float 18s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(-10%)
+            }
+
+            50% {
+                transform: translateX(10%)
+            }
+
+            100% {
+                transform: translateX(-10%)
+            }
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+            gap: 18px;
+            padding: 22px
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--glass);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, var(--accent-a), var(--accent-b));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white
+        }
+
+        .brand h1 {
+            font-size: 16px;
+            margin: 0
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px
+        }
+
+        .nav button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        .nav button.active,
+        .nav button:hover {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+            color: #071022
+        }
+
+        .nav .ic {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.6)
+        }
+
+        .sidebar .bottom {
+            margin-top: auto;
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .clock {
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: var(--card);
+            box-shadow: var(--shadow);
+            font-weight: 700
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--card);
+            cursor: pointer;
+            box-shadow: var(--shadow)
+        }
+
+        .workspace {
+            flex: 1;
+            display: flex;
+            gap: 14px;
+            align-items: stretch
+        }
+
+        /* panel center (dynamic content) */
+        .panel {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            overflow: auto
+        }
+
+        .panel h2 {
+            margin: 0 0 8px 0
+        }
+
+        .fade-enter {
+            animation: fadeIn 360ms ease both
+        }
+
+        .fade-leave {
+            animation: fadeOut 260ms ease both
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0)
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 14px
+        }
+
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(250, 250, 250, 0.9));
+            box-shadow: 0 8px 20px rgba(10, 15, 30, 0.03)
+        }
+
+        .todo-left {
+            width: 48px;
+            text-align: center
+        }
+
+        .todo-body {
+            flex: 1
+        }
+
+        .todo-title {
+            font-weight: 800
+        }
+
+        .todo-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 6px
+        }
+
+        .tag {
+            padding: 6px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.04)
+        }
+
+        .due {
+            font-weight: 700
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.06);
+            overflow: hidden
+        }
+
+        .progress>span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-a), var(--accent-b))
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .link-row,
+        .idea-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.85)
+        }
+
+        .favicon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #fff, #f6f6f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700
+        }
+
+        .link-info {
+            flex: 1
+        }
+
+        .pomodoro {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px
+        }
+
+        .apple {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+            position: relative
+        }
+
+        .apple .stem {
+            position: absolute;
+            top: -18px;
+            width: 46px;
+            height: 22px;
+            border-radius: 18px
+        }
+
+        .pom-controls {
+            display: flex;
+            gap: 8px
+        }
+
+        .music-pop {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 360px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: var(--shadow);
+            z-index: 40
+        }
+
+        .music-pop iframe {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            border: 0
+        }
+
+        .notes-area textarea {
+            width: 100%;
+            height: 220px;
+            border-radius: 12px;
+            padding: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.8)
+        }
+
+        @media(max-width:980px) {
+            .app {
+                padding: 12px
+            }
+
+            .sidebar {
+                display: none
+            }
+
+            .workspace {
+                flex-direction: column
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr
+            }
+
+            .main {
+                padding: 0
+            }
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+    <div class="cloud-bg">
+        <div class="clouds"></div>
+    </div>
+    <div class="app">
+        <div class="sidebar">
+            <div class="brand">
+                <div class="logo">KS</div>
+                <div>
+                    <h1>Kuin Smart Space</h1>
+                    <div class="small muted">Workspace</div>
+                </div>
+            </div>
+            <nav class="nav" id="nav">
+                <button data-view="home" class="active">
+                    <div class="ic">🏠</div> Home
+                </button>
+                <button data-view="todo">
+                    <div class="ic">✅</div> To‑Do
+                </button>
+                <button data-view="idea">
+                    <div class="ic">💡</div> Idea
+                </button>
+                <button data-view="pom">
+                    <div class="ic">🍏</div> Pomodoro
+                </button>
+                <button data-view="music">
+                    <div class="ic">🎵</div> Music
+                </button>
+                <button data-view="links">
+                    <div class="ic">🔗</div> Quick Links
+                </button>
+                <button data-view="notes">
+                    <div class="ic">📝</div> Notes
+                </button>
+                <button data-view="settings">
+                    <div class="ic">⚙️</div> Settings
+                </button>
+            </nav>
+            <div class="bottom small muted">Logged in as Quỳnh • Saved locally</div>
+        </div>
+
+        <div class="main">
+            <div class="topbar">
+                <div class="top-left">
+                    <div id="clock" class="clock">--:--</div>
+                </div>
+                <div class="actions">
+                    <button id="themeBtn" class="btn">Chế độ tối</button>
+                    <button id="bgBtn" class="btn">Thay nền</button>
+                    <button id="openMusicBtn" class="btn">Nhạc</button>
+                </div>
+            </div>
+
+            <div class="workspace">
+                <div id="content" class="panel fade-enter" style="width:100%;">
+                    <!-- dynamic content loads here -->
+
+                    <div id="homeView">
+                        <h2>Chào Quỳnh 👋</h2>
+                        <p class="muted">Chọn một mục bên trái để bắt đầu — To‑Do, Idea, Pomodoro, Music, Quick Links
+                            hoặc
+                            Notes.</p>
+                        <div style="margin-top:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+                            <div class="panel" style="min-height:120px">
+                                <h3>Quick actions</h3>
+                                <div style="display:flex;gap:8px;margin-top:8px"><button class="btn" id="quickAddTask">+
+                                        Task</button><button class="btn" id="quickOpenPom">Pomodoro</button></div>
+                            </div>
+                            <div class="panel" style="min-height:120px">
+                                <h3>Today's summary</h3>
+                                <div class="small muted" id="summary">Không có nhiệm vụ hôm nay.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ToDo view -->
+                    <div id="todoView" style="display:none">
+                        <h2>To‑Do</h2>
+                        <div class="grid-2">
+                            <div>
+                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><input
+                                        id="searchTask" placeholder="Tìm nhiệm vụ..."
+                                        style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)" /><button
+                                        id="addTaskBtn" class="btn">Thêm</button></div>
+                                <div class="todo-list" id="todoList"></div>
+                            </div>
+                            <div>
+                                <div class="panel" id="taskDetail">
+                                    <h3>Chi tiết</h3>
+                                    <div class="small muted">Chọn task để xem/ chỉnh sửa</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Idea view -->
+                    <div id="ideaView" style="display:none">
+                        <h2>Idea</h2>
+                        <div style="display:flex;gap:8px;margin-bottom:8px"><button id="addIdeaNew" class="btn">+ Thêm
+                                idea</button><button id="exportIdeas" class="btn">Xuất</button></div>
+                        <div class="links" id="ideaList"></div>
+                    </div>
+
+                    <!-- Pomodoro view -->
+                    <div id="pomView" style="display:none">
+                        <h2>Pomodoro</h2>
+                        <div style="display:flex;gap:18px;align-items:flex-start">
+                            <div style="flex:1" class="panel">
+                                <div class="pomodoro">
+                                    <div class="apple" id="appleMain"
+                                        style="background:linear-gradient(180deg,var(--accent-a),var(--accent-b))">
+                                        <div class="stem" style="background:rgba(0,0,0,0.25)"></div>
+                                        <div id="pomClockLarge" style="font-size:30px">25:00</div>
+                                    </div>
+                                    <div class="pom-controls"><input id="setWork" type="number" value="25"
+                                            style="width:80px;padding:6px;border-radius:8px;border:1px solid #eee" />
+                                        <input id="setBreak" type="number" value="5"
+                                            style="width:80px;padding:6px;border-radius:8px;border:1px solid #eee" />
+                                        <button id="startPomBtn" class="btn">Bắt đầu</button> <button id="pausePomBtn"
+                                            class="btn">Tạm dừng</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width:360px">
+                                <div class="panel">
+                                    <h3>Lịch sử nhanh</h3>
+                                    <div class="small muted">Buổi làm việc hôm nay: <span id="pomCount">0</span></div>
+                                </div>
+                                <div style="height:12px"></div>
+                                <div class="panel">
+                                    <h3>Tùy chỉnh</h3><label>Màu quả táo</label><input type="color" id="appleColorInput"
+                                        value="#8fc9ff" style="display:block;margin-top:8px" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Music view -->
+                    <div id="musicView" style="display:none">
+                        <h2>Music</h2>
+                        <div style="display:flex;gap:12px;align-items:center"><input id="ytUrl"
+                                placeholder="Dán link YouTube"
+                                style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)" /><button
+                                id="loadYtBtn" class="btn">Load</button><button id="openPopBtn" class="btn">Mở
+                                Player</button></div>
+                        <div style="margin-top:12px" id="musicPreview"></div>
+                    </div>
+
+                    <!-- Links view -->
+                    <div id="linksView" style="display:none">
+                        <h2>Quick Links</h2>
+                        <div style="display:flex;gap:8px;margin-bottom:8px"><button id="addLinkNew" class="btn">+ Thêm
+                                link</button><button id="exportLinks" class="btn">Xuất</button></div>
+                        <div class="links" id="linksList"></div>
+                    </div>
+
+                    <!-- Notes view -->
+                    <div id="notesView" style="display:none">
+                        <h2>Notes</h2>
+                        <div class="panel notes-area"><textarea id="noteMain"
+                                placeholder="Ghi chú... (lưu tự động)"></textarea></div>
+                    </div>
+
+                    <!-- Settings view -->
+                    <div id="settingsView" style="display:none">
+                        <h2>Settings</h2>
+                        <div class="panel"><label>Upload nền (ảnh)</label>
+                            <div style="display:flex;gap:8px;margin-top:8px"><input type="file" id="uploadBgFile"
+                                    accept="image/*" /><button id="clearBgBtn" class="btn">Xóa nền</button></div>
+                        </div>
+                        <div style="height:12px"></div>
+                        <div class="panel"><button id="exportAll" class="btn">Xuất toàn bộ (JSON)</button> <button
+                                id="importAll" class="btn">Nhập (JSON)</button><input type="file" id="importFile"
+                                accept="application/json" style="display:none" /></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- music popup -->
+    <div id="musicPop" class="music-pop" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong>Player</strong>
+            <div><button id="closePop" class="btn">Đóng</button></div>
+        </div>
+        <div id="ytHolder"></div>
+    </div>
+
+    <script>
+        // Basic UI routing
+        const nav = document.querySelectorAll('.nav button');
+        const views = ['home', 'todo', 'idea', 'pom', 'music', 'links', 'notes', 'settings'];
+        function showView(name) {
+            nav.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+            views.forEach(v => { const el = document.getElementById(v + 'View'); if (el) el.style.display = v === name ? '' : 'none'; });
+            // animate content
+            const content = document.getElementById('content'); content.classList.remove('fade-enter'); void content.offsetWidth; content.classList.add('fade-enter');
+            localStorage.setItem('lastView', name);
+        }
+        nav.forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+        (function () { const last = localStorage.getItem('lastView') || 'home'; showView(last); })();
+
+        // clock
+        function tick() { document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+        setInterval(tick, 1000); tick();
+
+        // Background upload
+        const uploadBgFile = document.getElementById('uploadBgFile');
+        uploadBgFile && uploadBgFile.addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { document.documentElement.style.setProperty('--bg-custom', 'url(' + r.result + ')'); document.body.style.backgroundImage = `url(${r.result})`; document.body.style.backgroundSize = 'cover'; localStorage.setItem('bgImg', r.result); }; r.readAsDataURL(f); });
+        (function () { const bg = localStorage.getItem('bgImg'); if (bg) { document.body.style.backgroundImage = `url(${bg})`; document.body.style.backgroundSize = 'cover'; } })();
+        document.getElementById('clearBgBtn').addEventListener('click', () => { document.body.style.backgroundImage = ''; localStorage.removeItem('bgImg'); });
+        document.getElementById('bgBtn').addEventListener('click', () => { document.getElementById('uploadBgFile').click(); });
+
+        // theme toggle
+        document.getElementById('themeBtn').addEventListener('click', () => { const cur = document.body.getAttribute('data-theme') || 'light'; const next = cur === 'light' ? 'dark' : 'light'; document.body.setAttribute('data-theme', next); localStorage.setItem('theme', next); document.getElementById('themeBtn').textContent = next === 'light' ? 'Chế độ tối' : 'Chế độ sáng'; });
+        (function () { const t = localStorage.getItem('theme') || 'light'; document.body.setAttribute('data-theme', t); document.getElementById('themeBtn').textContent = t === 'light' ? 'Chế độ tối' : 'Chế độ sáng'; })();
+
+        // -------------------- To-Do logic --------------------
+        function loadTasks() { return JSON.parse(localStorage.getItem('ks_tasks') || '[]'); }
+        function saveTasks(a) { localStorage.setItem('ks_tasks', JSON.stringify(a)); }
+        const todoList = document.getElementById('todoList');
+        function renderTasks(filter = '') {
+            const arr = loadTasks(); todoList.innerHTML = ''; const today = new Date().toISOString().slice(0, 10);
+            const filtered = arr.filter(t => (t.title || '').toLowerCase().includes((filter || '').toLowerCase()));
+            if (filtered.length === 0) todoList.innerHTML = '<div class="muted">Không có nhiệm vụ</div>';
+            filtered.forEach((t, idx) => {
+                const div = document.createElement('div'); div.className = 'todo-item';
+                div.innerHTML = `<div class="todo-left"><input type="checkbox" data-idx="${idx}" ${t.done ? 'checked' : ''} /></div><div class="todo-body"><div class="todo-title">${escapeHTML(t.title)}</div><div class="todo-meta"><div class="tag">${escapeHTML(t.tag || 'General')}</div>${t.deadline ? `<div class="due ${t.deadline === today ? 'due-today' : ''}">${t.deadline}</div>` : ''}<div style="flex:1"></div></div><div style="margin-top:8px"><div class="progress"><span style="width:${t.progress || 0}%"></span></div></div></div>`;
+                todoList.appendChild(div);
+                // click select
+                div.querySelector('.todo-body').addEventListener('click', () => showTaskDetail(idx));
+                div.querySelector('input[type=checkbox]').addEventListener('change', e => { const a = loadTasks(); a[idx].done = e.target.checked; saveTasks(a); renderTasks(document.getElementById('searchTask').value); updateSummary(); });
+            }); updateSummary();
+        }
+        function escapeHTML(s) { return String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
+        document.getElementById('addTaskBtn').addEventListener('click', () => { const title = prompt('Tiêu đề nhiệm vụ'); if (!title) return; const deadline = prompt('Hạn (YYYY-MM-DD) - bỏ trống nếu không'); const tag = prompt('Tag (ví dụ: Work, Study)') || 'General'; const arr = loadTasks(); arr.unshift({ title, deadline: deadline || null, tag, subtasks: [], progress: 0, done: false, note: '' }); saveTasks(arr); renderTasks(); });
+        document.getElementById('searchTask').addEventListener('input', e => renderTasks(e.target.value));
+
+        function showTaskDetail(idx) {
+            const arr = loadTasks(); const t = arr[idx]; if (!t) return;
+            const detail = document.getElementById('taskDetail');
+            detail.innerHTML = `<h3>${escapeHTML(t.title)}</h3><div class="small muted">Tag: ${escapeHTML(t.tag)} • Hạn: ${t.deadline || '—'}</div><div style="margin-top:8px"><textarea id="taskNote" style="width:100%;height:80px;border-radius:8px;padding:8px">${escapeHTML(t.note)}</textarea></div><div style="margin-top:8px;display:flex;gap:8px"><button id="saveTaskBtn" class="btn">Lưu</button><button id="addSubBtn" class="btn">+ Subtask</button><button id="delTaskBtn" class="btn">Xóa</button></div><div style="margin-top:10px"><h4>Subtasks</h4><div id="subList"></div></div>`;
+            const subList = detail.querySelector('#subList');
+            (t.subtasks || []).forEach((s, si) => {
+                const row = document.createElement('div'); row.style.display = 'flex'; row.style.gap = '8px'; row.style.alignItems = 'center'; row.style.marginTop = '6px';
+                row.innerHTML = `<input type="checkbox" data-si="${si}" ${s.done ? 'checked' : ''} /> <div style="flex:1">${escapeHTML(s.text)}</div> <button data-si="${si}" class="btn delSub">x</button>`;
+                subList.appendChild(row);
+                row.querySelector('input').addEventListener('change', e => { t.subtasks[si].done = e.target.checked; saveTasks(arr); renderTasks(); showTaskDetail(idx); });
+                row.querySelector('.delSub').addEventListener('click', () => { t.subtasks.splice(si, 1); saveTasks(arr); renderTasks(); showTaskDetail(idx); });
+            });
+            detail.querySelector('#saveTaskBtn').addEventListener('click', () => { t.note = detail.querySelector('#taskNote').value; saveTasks(arr); alert('Đã lưu'); renderTasks(); updateSummary(); });
+            detail.querySelector('#addSubBtn').addEventListener('click', () => { const text = prompt('Nội dung subtask'); if (!text) return; t.subtasks = t.subtasks || []; t.subtasks.push({ text, done: false }); saveTasks(arr); showTaskDetail(idx); renderTasks(); updateSummary(); });
+            detail.querySelector('#delTaskBtn').addEventListener('click', () => { if (confirm('Xóa nhiệm vụ?')) { arr.splice(idx, 1); saveTasks(arr); renderTasks(); detail.innerHTML = '<div class="small muted">Chọn task để xem/ chỉnh sửa</div>'; updateSummary(); } });
+        }
+
+        function updateSummary() { const arr = loadTasks(); const today = new Date().toISOString().slice(0, 10); const todayCount = arr.filter(t => t.deadline === today).length; document.getElementById('summary').textContent = `${arr.length} nhiệm vụ • ${todayCount} hôm nay`; }
+        renderTasks();
+
+        // Quick add from home
+        document.getElementById('quickAddTask').addEventListener('click', () => { document.getElementById('addTaskBtn').click(); showView('todo'); });
+        document.getElementById('quickOpenPom').addEventListener('click', () => showView('pom'));
+
+        // -------------------- Idea board --------------------
+        function loadIdeas() { return JSON.parse(localStorage.getItem('ks_ideas') || '[]'); }
+        function saveIdeas(a) { localStorage.setItem('ks_ideas', JSON.stringify(a)); }
+        const ideaList = document.getElementById('ideaList');
+        function renderIdeas() {
+            const arr = loadIdeas(); ideaList.innerHTML = ''; if (arr.length === 0) ideaList.innerHTML = '<div class="muted">Chưa có idea</div>';
+            arr.forEach((it, idx) => {
+                const row = document.createElement('div'); row.className = 'idea-row';
+                row.innerHTML = `<div class='favicon'>💡</div><div style='flex:1'><div style='font-weight:700'>${escapeHTML(it.title)}</div><div class='small muted'>${escapeHTML(it.note || '')}</div></div><div><button class='btn openIdea' data-idx='${idx}'>Sửa</button> <button class='btn delIdea' data-idx='${idx}'>X</button></div>`;
+                ideaList.appendChild(row);
+                row.querySelector('.openIdea').addEventListener('click', () => editIdea(idx));
+                row.querySelector('.delIdea').addEventListener('click', () => { const arr = loadIdeas(); arr.splice(idx, 1); saveIdeas(arr); renderIdeas(); });
+            });
+        }
+        document.getElementById('addIdeaNew').addEventListener('click', () => { const title = prompt('Tiêu đề idea'); if (!title) return; const note = prompt('Ghi chú (tuỳ chọn)') || ''; const arr = loadIdeas(); arr.unshift({ title, note, created: new Date().toISOString() }); saveIdeas(arr); renderIdeas(); });
+        function editIdea(i) { const arr = loadIdeas(); const it = arr[i]; if (!it) return; const newTitle = prompt('Tiêu đề', it.title); if (newTitle === null) return; const newNote = prompt('Ghi chú', it.note || '') || ''; it.title = newTitle; it.note = newNote; saveIdeas(arr); renderIdeas(); }
+        document.getElementById('exportIdeas').addEventListener('click', () => { const blob = new Blob([JSON.stringify(loadIdeas(), null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'ideas.json'; a.click(); });
+        renderIdeas();
+
+        // -------------------- Quick Links --------------------
+        function loadLinks() { return JSON.parse(localStorage.getItem('ks_links') || '[]'); }
+        function saveLinks(a) { localStorage.setItem('ks_links', JSON.stringify(a)); }
+        const linksList = document.getElementById('linksList');
+        function renderLinks() {
+            const arr = loadLinks(); linksList.innerHTML = ''; if (arr.length === 0) linksList.innerHTML = '<div class="muted">Chưa có link</div>';
+            arr.forEach((l, idx) => {
+                const row = document.createElement('div'); row.className = 'link-row';
+                row.innerHTML = `<div class='favicon'>${faviconText(l.url)}</div><div class='link-info'><div style='font-weight:700'>${escapeHTML(l.title)}</div><div class='small muted'>${escapeHTML(l.url)}</div></div><div><button class='btn openLink' data-idx='${idx}'>Mở</button> <button class='btn delLink' data-idx='${idx}'>X</button></div>`;
+                linksList.appendChild(row);
+                row.querySelector('.openLink').addEventListener('click', () => window.open(l.url, '_blank'));
+                row.querySelector('.delLink').addEventListener('click', () => { arr.splice(idx, 1); saveLinks(arr); renderLinks(); });
+            });
+        }
+        function faviconText(u) { try { const host = new URL(u).hostname.replace('www.', ''); return host.split('.')[0].slice(0, 2).toUpperCase(); } catch (e) { return '🔗'; } }
+        document.getElementById('addLinkNew').addEventListener('click', () => { const title = prompt('Tên link'); if (!title) return; const url = prompt('URL (bắt đầu http)'); if (!url) return; const arr = loadLinks(); arr.unshift({ title, url }); saveLinks(arr); renderLinks(); });
+        document.getElementById('exportLinks').addEventListener('click', () => { const blob = new Blob([JSON.stringify(loadLinks(), null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'links.json'; a.click(); });
+        renderLinks();
+
+        // -------------------- Music (YouTube) --------------------
+        const loadYtBtn = document.getElementById('loadYtBtn');
+        const ytHolder = document.getElementById('musicPreview');
+        const musicPop = document.getElementById('musicPop');
+        const openPopBtn = document.getElementById('openPopBtn');
+        const openMusicBtn = document.getElementById('openMusicBtn');
+        function toEmbed(url) { try { const u = new URL(url); if (u.hostname.includes('youtube')) { if (u.searchParams.get('v')) return 'https://www.youtube.com/embed/' + u.searchParams.get('v') + '?rel=0&autoplay=1'; if (u.searchParams.get('list')) return 'https://www.youtube.com/embed?list=' + u.searchParams.get('list') + '&autoplay=1'; if (u.pathname.startsWith('/shorts/')) return 'https://www.youtube.com/embed' + u.pathname + '?rel=0&autoplay=1'; } if (u.hostname === 'youtu.be') { return 'https://www.youtube.com/embed/' + u.pathname.slice(1) + '?rel=0&autoplay=1'; } } catch (e) { } return null; }
+        loadYtBtn.addEventListener('click', () => { const v = document.getElementById('ytUrl').value.trim(); if (!v) return alert('Dán link YouTube'); const e = toEmbed(v); if (!e) return alert('Link không hợp lệ'); ytHolder.innerHTML = `<iframe width="100%" height="180" src="${e}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; localStorage.setItem('lastYT', v); });
+        // Open popup player (play only when user clicks)
+        openPopBtn.addEventListener('click', () => { const v = document.getElementById('ytUrl').value.trim() || localStorage.getItem('lastYT'); if (!v) return alert('Chưa có video'); const e = toEmbed(v); if (!e) return alert('Link không hợp lệ'); document.getElementById('ytHolder').innerHTML = `<iframe src="${e}" allow="autoplay; encrypted-media" width="100%" height="200"></iframe>`; musicPop.style.display = 'block'; });
+        document.getElementById('openMusicBtn').addEventListener('click', () => musicPop.style.display = musicPop.style.display === 'block' ? 'none' : 'block');
+        document.getElementById('closePop').addEventListener('click', () => musicPop.style.display = 'none');
+        (function () { const l = localStorage.getItem('lastYT'); if (l) document.getElementById('ytUrl').value = l; })();
+
+        // -------------------- Pomodoro --------------------
+        let pomInterval = null; let pomRemaining = 25 * 60; let pomRunning = false; let pomMode = 'work'; let pomCount = 0;
+        const pomClockLarge = document.getElementById('pomClockLarge'); const startPomBtn = document.getElementById('startPomBtn'); const pausePomBtn = document.getElementById('pausePomBtn'); const setWork = document.getElementById('setWork'); const setBreak = document.getElementById('setBreak'); const pomCountEl = document.getElementById('pomCount'); const appleMain = document.getElementById('appleMain'); const appleColorInput = document.getElementById('appleColorInput');
+        function renderPom() { const mm = Math.floor(pomRemaining / 60); const ss = pomRemaining % 60; pomClockLarge.textContent = `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`; }
+        function startPom() { if (pomRunning) return; pomRunning = true; pomInterval = setInterval(() => { if (pomRemaining > 0) { pomRemaining--; renderPom(); } else { notifyPom(); if (pomMode === 'work') { pomCount++; pomCountEl.textContent = pomCount; pomMode = 'break'; pomRemaining = (+setBreak.value || 5) * 60; } else { pomMode = 'work'; pomRemaining = (+setWork.value || 25) * 60; } renderPom(); } }, 1000); }
+        function pausePom() { pomRunning = false; clearInterval(pomInterval); pomInterval = null; }
+        startPomBtn.addEventListener('click', () => { pomRemaining = (+setWork.value || 25) * 60; startPom(); }); pausePomBtn.addEventListener('click', () => pausePom());
+        function notifyPom() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.type = 'sine'; o.frequency.value = 880; g.gain.value = 0.03; o.connect(g); g.connect(ctx.destination); o.start(); setTimeout(() => { o.stop(); ctx.close(); }, 600); } catch (e) { } alert('Pomodoro kết thúc!'); }
+        appleColorInput.addEventListener('input', () => { const v = appleColorInput.value; appleMain.style.background = `linear-gradient(180deg, ${v}, ${shade(v, -20)})`; localStorage.setItem('appleColor', v); });
+        (function () { const ac = localStorage.getItem('appleColor'); if (ac) { appleColorInput.value = ac; appleMain.style.background = `linear-gradient(180deg, ${ac}, ${shade(ac, -20)})`; } })();
+
+        // -------------------- Notes autosave --------------------
+        const noteMain = document.getElementById('noteMain'); noteMain.value = localStorage.getItem('ks_note') || ''; noteMain.addEventListener('input', () => localStorage.setItem('ks_note', noteMain.value));
+
+        // -------------------- Export/Import --------------------
+        document.getElementById('exportAll').addEventListener('click', () => { const data = { tasks: loadTasks(), ideas: loadIdeas(), links: loadLinks(), note: noteMain.value, settings: { theme: document.body.getAttribute('data-theme') || 'light', bg: localStorage.getItem('bgImg') || null, appleColor: localStorage.getItem('appleColor') || null, lastYT: localStorage.getItem('lastYT') || null } }; const b = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'kuin-workspace.json'; a.click(); });
+        document.getElementById('importAll').addEventListener('click', () => document.getElementById('importFile').click());
+        document.getElementById('importFile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { const j = JSON.parse(r.result); if (j.tasks) localStorage.setItem('ks_tasks', JSON.stringify(j.tasks)); if (j.ideas) localStorage.setItem('ks_ideas', JSON.stringify(j.ideas)); if (j.links) localStorage.setItem('ks_links', JSON.stringify(j.links)); if (j.note) localStorage.setItem('ks_note', j.note); if (j.settings) { if (j.settings.theme) localStorage.setItem('theme', j.settings.theme); if (j.settings.bg) { localStorage.setItem('bgImg', j.settings.bg); document.body.style.backgroundImage = `url(${j.settings.bg})`; } if (j.settings.appleColor) localStorage.setItem('appleColor', j.settings.appleColor); if (j.settings.lastYT) localStorage.setItem('lastYT', j.settings.lastYT); } alert('Nhập xong - tải lại trang để áp dụng đầy đủ'); renderTasks(); renderLinks(); renderIdeas(); noteMain.value = localStorage.getItem('ks_note') || ''; } catch (err) { alert('File không hợp lệ'); } }; r.readAsText(f); });
+
+        // utility shade
+        function shade(hex, p) { const f = hex.slice(1); const t = p < 0 ? 0 : 255; const P = Math.abs(p) / 100; const R = parseInt(f.substring(0, 2), 16); const G = parseInt(f.substring(2, 4), 16); const B = parseInt(f.substring(4, 6), 16); const newR = Math.round((t - R) * P) + R; const newG = Math.round((t - G) * P) + G; const newB = Math.round((t - B) * P) + B; return `rgb(${newR},${newG},${newB})`; }
+
+        // initial
+        (function () { renderTasks(); renderLinks(); renderIdeas(); document.getElementById('pomCount').textContent = pomCount; })();
+
+        // small shortcuts
+        document.getElementById('startPomBtn').addEventListener('dblclick', () => { alert('Double-clicked start — quick tip: space to pause/resume') });
+
+        // expose showView globally for quick calls
+        window.showView = showView;
+
+        // lightweight saving for tasks and links
+    </script>
+</body>
+
+</html>
